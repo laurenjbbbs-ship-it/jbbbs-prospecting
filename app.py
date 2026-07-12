@@ -29,12 +29,13 @@ auth.sidebar_identity(user)
 ranked = st.Page("pages/1_Ranked_List.py", title="Ranked List", icon="📋",
                  default=True)
 lookup = st.Page("pages/4_Lookup.py", title="Lookup", icon="🔎")
+imports = st.Page("pages/5_Import_Data.py", title="Import Data", icon="📥")
 upload = st.Page("pages/2_Upload_Reports.py", title="Upload Reports", icon="📤")
 review = st.Page("pages/3_Review_Matches.py", title="Review Matches", icon="✅")
 
 # Role-based navigation.
 pages = [ranked, lookup]
 if user.is_manager:
-    pages += [upload, review]
+    pages += [imports, upload, review]
 
 st.navigation(pages).run()
