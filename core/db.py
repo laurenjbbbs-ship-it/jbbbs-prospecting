@@ -154,6 +154,15 @@ def get_engine() -> Engine:
     return _ENGINE
 
 
+# Additive migrations for columns introduced after first deploy. Idempotent.
+_MIGRATIONS = [
+    "ALTER TABLE volunteers ADD COLUMN IF NOT EXISTS email TEXT",
+    "ALTER TABLE donors ADD COLUMN IF NOT EXISTS email TEXT",
+    "ALTER TABLE attendees ADD COLUMN IF NOT EXISTS email TEXT",
+    "ALTER TABLE linkedin ADD COLUMN IF NOT EXISTS email TEXT",
+]
+
+
 def init_schema() -> None:
     """Create all tables if they do not already exist. Safe to call repeatedly."""
     engine = get_engine()
@@ -161,6 +170,8 @@ def init_schema() -> None:
         for statement in _SCHEMA.split(";"):
             if statement.strip():
                 conn.execute(text(statement))
+        for migration in _MIGRATIONS:
+            conn.execute(text(migration))
 
 
 def replace_source_table(table: str, df: pd.DataFrame,

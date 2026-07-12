@@ -109,6 +109,7 @@ def build_rows(source_key: str, df: pd.DataFrame, mapping: dict[str, str]) -> pd
             status = "former" if closure else "current"
             out.append({
                 "first_name": first, "last_name": last,
+                "email": _col(row, mapping, "email"),
                 "program": PROGRAM_BY_SOURCE_LABEL.get(source_key),
                 "status": status,
                 "city": _col(row, mapping, "city"),
@@ -126,6 +127,7 @@ def build_rows(source_key: str, df: pd.DataFrame, mapping: dict[str, str]) -> pd
             last_gift = _to_float(_col(row, mapping, "last_gift"))
             out.append({
                 "first_name": first, "last_name": last,
+                "email": _col(row, mapping, "email"),
                 "organization": _col(row, mapping, "organization"),
                 "city": _col(row, mapping, "city"),
                 "first_gift": _to_float(_col(row, mapping, "first_gift")),
@@ -138,6 +140,7 @@ def build_rows(source_key: str, df: pd.DataFrame, mapping: dict[str, str]) -> pd
         elif table == "attendees":
             out.append({
                 "first_name": first, "last_name": last,
+                "email": _col(row, mapping, "email"),
                 "organization": _col(row, mapping, "organization"),
                 "city": _col(row, mapping, "city"),
                 "event_attended": _col(row, mapping, "event_attended"),
@@ -146,6 +149,7 @@ def build_rows(source_key: str, df: pd.DataFrame, mapping: dict[str, str]) -> pd
         elif table == "linkedin":
             out.append({
                 "first_name": first, "last_name": last,
+                "email": _col(row, mapping, "email"),
                 "company": _col(row, mapping, "company"),
                 "position": _col(row, mapping, "position"),
                 "connected_date": _col(row, mapping, "connected_date"),

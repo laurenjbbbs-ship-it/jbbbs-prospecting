@@ -32,8 +32,8 @@ SEGMENT_ORDER = {
 RANKED_COLUMNS = [
     "name", "segment", "priority", "program", "volunteer_status", "match_history",
     "donor_tier", "amount", "outside_sources", "num_outside_sources", "town",
-    "job_title", "industry", "employer", "age_or_life_stage", "spouse_or_household",
-    "connection_source", "capacity_hint",
+    "email", "job_title", "industry", "employer", "age_or_life_stage",
+    "spouse_or_household", "connection_source", "capacity_hint",
 ]
 
 
@@ -183,6 +183,7 @@ def _aggregate(recs: list[Record]) -> dict[str, Any]:
 
     # Context fields, from own records (blank for report-only names).
     town = _first(recs, ["volunteer", "donor", "board", "attendee"], "city")
+    email = _first(recs, ["volunteer", "donor", "attendee", "linkedin"], "email")
     job_title = _first(recs, ["volunteer", "linkedin"], "job_title") or \
         _first(recs, ["linkedin"], "position")
     industry = _first(recs, ["volunteer"], "industry")
@@ -224,6 +225,7 @@ def _aggregate(recs: list[Record]) -> dict[str, Any]:
         "outside_sources": ", ".join(dict.fromkeys(outside)) or None,
         "num_outside_sources": num_outside,
         "town": town,
+        "email": email,
         "job_title": job_title,
         "industry": industry,
         "employer": employer,
@@ -270,6 +272,8 @@ def lookup(tables: dict[str, pd.DataFrame], query: str) -> dict[str, Any]:
     for r in records:
         if r.normalized_name == q or (q in r.normalized_name) or (r.normalized_name in q and r.normalized_name):
             detail = {"source": r.source, "name": r.label, "city": r.city}
+            if r.payload.get("email"):
+                detail["email"] = r.payload.get("email")
             if r.source == "donor":
                 detail["tier"] = r.payload.get("tier")
                 detail["amount"] = r.payload.get("amount")
