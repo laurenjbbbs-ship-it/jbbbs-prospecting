@@ -29,7 +29,8 @@ with st.expander("What's loaded now", expanded=True):
         "Board connections": len(db.read_table("board_connections")),
         "Reports": len(db.read_table("reports")),
     }
-    st.table(pd.DataFrame({"Source": counts.keys(), "Rows": counts.values()}))
+    st.table(pd.DataFrame({"Source": list(counts.keys()),
+                           "Rows": list(counts.values())}))
 
 st.divider()
 
