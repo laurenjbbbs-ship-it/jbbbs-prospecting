@@ -7,14 +7,15 @@ tiebreaker, never a reason a name surfaces.
 
 ## Who does what
 
-| Person | Role | Can |
-|--------|------|-----|
-| Dayna | **Manager** | Everything: upload reports, clear the review queue, refresh source exports, read the list |
-| Amy, Casey, Zack Roe | **Reader** | Read the Ranked List and Lookup |
-| Lauren | Manager | Builds and maintains the tool |
+Sign-in is a **shared team password** (no Google/Microsoft accounts needed). The
+team chose a single password that grants **full access to everyone** who has it —
+so all five people can upload, review, and read.
 
-Readers never see Upload or Review, and cannot reach those pages even by typing
-the URL.
+The manager/reader split is still built in and can be switched on any time by
+adding a second, **view-only** password (`reader_password` in the secrets): people
+who sign in with that password get the Ranked List and Lookup only, and are
+blocked from Upload and Review — enforced in code on each page, not just hidden in
+the menu.
 
 ## The four pages
 
@@ -68,9 +69,9 @@ The app is a [Streamlit](https://streamlit.io) app backed by Neon Postgres.
 the synthetic sample CSVs/PDFs into `sample_data/` and reloads them into the
 database.
 
-**Secrets** live in `.streamlit/secrets.toml` (git-ignored — never uploaded):
-the Neon connection string, the Google sign-in keys, and the email→role
-allowlist.
+**Secrets** live in `.streamlit/secrets.toml` locally (git-ignored — never
+uploaded) and in the Streamlit Cloud app's **Secrets** box in production: the Neon
+connection string and the team password(s). Nothing sensitive is in the code repo.
 
 ### Environment (already set up)
 
@@ -81,9 +82,10 @@ allowlist.
   optional. Without it, digital PDFs still work and scanned PDFs show a clear
   message instead of failing.
 
-## Deploying (later)
+## Deploying
 
-Streamlit Community Cloud (private) + Neon + Google sign-in. Add the same secrets
-in the Cloud UI, add the `streamlit.app` redirect URI to the Google OAuth client,
-and confirm the app is private with the five-email allowlist **before loading any
-real donor data**.
+Deployed on **Streamlit Community Cloud** (free tier, public URL) at
+`https://jbbbs-donors.streamlit.app`, reading from Neon. All data sits behind the
+team-password sign-in wall, so nothing is visible without the password. Secrets
+(the Neon URL and the team password) are set in the Cloud app's **Secrets** box,
+not in the repo. Set a strong team password **before loading any real donor data**.

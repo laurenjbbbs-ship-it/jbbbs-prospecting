@@ -6,6 +6,7 @@ Streamlit. Nothing sensitive is hard-coded here.
 """
 from __future__ import annotations
 
+import hmac
 import os
 from typing import Any
 
@@ -75,18 +76,27 @@ def dev_role_override() -> str | None:
     return role if role in ("manager", "reader") else None
 
 
-def role_for_email(email: str | None) -> str | None:
-    """Map a signed-in email to 'manager' or 'reader' via the allowlist.
+def passwords_configured() -> bool:
+    """True if at least one team password is set in secrets (fail-closed if not)."""
+    pwds = _secret("passwords", {}) or {}
+    return bool(pwds.get("manager_password") or pwds.get("reader_password"))
 
-    Returns None if the email is not on the list (blocked)."""
-    if not email:
+
+def check_password(password: str) -> str | None:
+    """Return the role for a given password, or None if it doesn't match.
+
+    A single shared 'manager_password' gives everyone full access. An optional
+    'reader_password' can be set later to grant view-only access. Comparison is
+    constant-time."""
+    if not password:
         return None
-    roles = _secret("roles", {}) or {}
-    # Case-insensitive match.
-    email_l = email.strip().lower()
-    for listed_email, role in dict(roles).items():
-        if str(listed_email).strip().lower() == email_l:
-            return str(role).strip().lower()
+    pwds = _secret("passwords", {}) or {}
+    manager_pw = pwds.get("manager_password")
+    reader_pw = pwds.get("reader_password")
+    if manager_pw and hmac.compare_digest(str(password), str(manager_pw)):
+        return "manager"
+    if reader_pw and hmac.compare_digest(str(password), str(reader_pw)):
+        return "reader"
     return None
 
 
